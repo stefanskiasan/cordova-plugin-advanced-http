@@ -5,33 +5,33 @@ module.exports = function init(global, jsUtil, cookieHandler, messages, base64, 
   var validHttpMethods = ['get', 'put', 'post', 'patch', 'head', 'delete', 'options', 'upload', 'download'];
   var validResponseTypes = ['text', 'json', 'arraybuffer', 'blob'];
 
-  var nextRequestId = (function(){
+  var nextRequestId = (function () {
     var currReqId = 0;
     return function nextRequestId() {
-        return ++currReqId;
+      return ++currReqId;
     }
   })();
 
   var interface = {
     b64EncodeUnicode: b64EncodeUnicode,
-    checkClientAuthMode: checkClientAuthMode,
-    checkClientAuthOptions: checkClientAuthOptions,
-    checkDownloadFilePath: checkDownloadFilePath,
-    checkFollowRedirectValue: checkFollowRedirectValue,
-    checkForBlacklistedHeaderKey: checkForBlacklistedHeaderKey,
-    checkForInvalidHeaderValue: checkForInvalidHeaderValue,
-    checkSerializer: checkSerializer,
-    checkSSLCertMode: checkSSLCertMode,
-    checkTimeoutValue: checkTimeoutValue,
-    checkUploadFileOptions: checkUploadFileOptions,
-    getMergedHeaders: getMergedHeaders,
-    processData: processData,
-    handleMissingCallbacks: handleMissingCallbacks,
-    handleMissingOptions: handleMissingOptions,
-    injectCookieHandler: injectCookieHandler,
-    injectFileEntryHandler: injectFileEntryHandler,
-    injectRawResponseHandler: injectRawResponseHandler,
-    nextRequestId: nextRequestId,
+      checkClientAuthMode: checkClientAuthMode,
+      checkClientAuthOptions: checkClientAuthOptions,
+      checkDownloadFilePath: checkDownloadFilePath,
+      checkFollowRedirectValue: checkFollowRedirectValue,
+      checkForBlacklistedHeaderKey: checkForBlacklistedHeaderKey,
+      checkForInvalidHeaderValue: checkForInvalidHeaderValue,
+      checkSerializer: checkSerializer,
+      checkSSLCertMode: checkSSLCertMode,
+      checkTimeoutValue: checkTimeoutValue,
+      checkUploadFileOptions: checkUploadFileOptions,
+      getMergedHeaders: getMergedHeaders,
+      processData: processData,
+      handleMissingCallbacks: handleMissingCallbacks,
+      handleMissingOptions: handleMissingOptions,
+      injectCookieHandler: injectCookieHandler,
+      injectFileEntryHandler: injectFileEntryHandler,
+      injectRawResponseHandler: injectRawResponseHandler,
+      nextRequestId: nextRequestId,
   };
 
   // expose all functions for testing purposes
@@ -156,8 +156,8 @@ module.exports = function init(global, jsUtil, cookieHandler, messages, base64, 
 
     // systemstore
     if (mode === validClientAuthModes[1]) {
-      if (jsUtil.getTypeOf(options.alias) !== 'String'
-        && jsUtil.getTypeOf(options.alias) !== 'Undefined') {
+      if (jsUtil.getTypeOf(options.alias) !== 'String' &&
+        jsUtil.getTypeOf(options.alias) !== 'Undefined') {
         throw new Error(messages.INVALID_CLIENT_AUTH_ALIAS);
       }
 
@@ -274,7 +274,7 @@ module.exports = function init(global, jsUtil, cookieHandler, messages, base64, 
   }
 
   function createFileEntry(rawEntry) {
-    var entry = new (require('cordova-plugin-file.FileEntry'))();
+    var entry = new(require('cordova-plugin-file.FileEntry'))();
 
     entry.isDirectory = rawEntry.isDirectory;
     entry.isFile = rawEntry.isFile;
@@ -305,16 +305,16 @@ module.exports = function init(global, jsUtil, cookieHandler, messages, base64, 
       try {
         // json
         if (responseType === validResponseTypes[1]) {
-          response.data = response.data === ''
-            ? undefined
-            : JSON.parse(response.data);
+          response.data = response.data === '' ?
+            undefined :
+            JSON.parse(response.data);
         }
 
         // arraybuffer
         else if (responseType === validResponseTypes[2]) {
-          response.data = response.data === ''
-            ? null
-            : base64.toArrayBuffer(response.data);
+          response.data = response.data === '' ?
+            null :
+            base64.toArrayBuffer(response.data);
         }
 
         // blob
@@ -324,7 +324,9 @@ module.exports = function init(global, jsUtil, cookieHandler, messages, base64, 
           } else {
             var buffer = base64.toArrayBuffer(response.data);
             var type = response.headers['content-type'] || '';
-            var blob = new Blob([buffer], { type: type });
+            var blob = new Blob([buffer], {
+              type: type
+            });
             response.data = blob;
           }
         }
@@ -351,7 +353,9 @@ module.exports = function init(global, jsUtil, cookieHandler, messages, base64, 
     var cookieString = cookieHandler.getCookieString(url);
 
     if (cookieString.length) {
-      return { Cookie: cookieHandler.getCookieString(url) };
+      return {
+        Cookie: cookieHandler.getCookieString(url)
+      };
     }
 
     return {};
@@ -419,7 +423,9 @@ module.exports = function init(global, jsUtil, cookieHandler, messages, base64, 
 
     switch (dataSerializer) {
       case 'utf8':
-        return cb({ text: data });
+        return cb({
+          text: data
+        });
       case 'raw':
         return cb(currentDataType === 'Uint8Array' ? data.buffer : data);
       case 'multipart':
@@ -448,6 +454,12 @@ module.exports = function init(global, jsUtil, cookieHandler, messages, base64, 
     processFormDataIterator(iterator, textEncoder, result, cb);
   }
 
+  function getFileReader() {
+    const fileReader = new FileReader();
+    const zoneOriginalInstance = (fileReader)['__zone_symbol__originalInstance'];
+    return zoneOriginalInstance || fileReader;
+  }
+
   function processFormDataIterator(iterator, textEncoder, result, onFinished) {
     var entry = iterator.next();
 
@@ -456,7 +468,7 @@ module.exports = function init(global, jsUtil, cookieHandler, messages, base64, 
     }
 
     if (entry.value[1] instanceof global.Blob || entry.value[1] instanceof global.File) {
-      var reader = new global.FileReader();
+      var reader = getFileReader();
 
       reader.onload = function () {
         result.buffers.push(base64.fromArrayBuffer(reader.result));
